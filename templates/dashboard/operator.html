@@ -1,0 +1,408 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PM Dashboard — Operator Workspace" />
+  <title>Operator Dashboard — PM Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- CSS load order: base → sidebar → operator -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sidebar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/operator.css' %}" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SIDEBAR OVERLAY (mobile)
+════════════════════════════════════════════════════════════════ -->
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APP ROOT
+════════════════════════════════════════════════════════════════ -->
+<div class="app-root">
+
+  <!-- ── SIDEBAR ────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Operator navigation">
+    <div class="sidebar-inner">
+
+      <!-- Logo -->
+      <div class="sidebar-logo-wrap">
+        <div class="sidebar-logo-icon">
+          <svg width="18" height="18" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <path d="M6 28V14L18 7l12 7v14" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <rect x="13" y="19" width="10" height="9" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <circle cx="18" cy="14" r="2.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <div class="sidebar-logo-text">PM Dashboard</div>
+          <div class="sidebar-logo-version">OPERATOR</div>
+        </div>
+        <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close sidebar" style="margin-left:auto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- User card -->
+      <div class="sidebar-user">
+        <div class="user-avatar" id="user-avatar">OP</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebar-user-name">Operator</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Operator</div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="sidebar-nav">
+        <div class="nav-section-label">Workspace</div>
+        <a class="nav-item active" data-section="predict" role="button" tabindex="0" id="nav-predict">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          Run Prediction
+        </a>
+        <a class="nav-item" data-section="history" role="button" tabindex="0" id="nav-history">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          My History
+        </a>
+        <a class="nav-item" data-section="machines" role="button" tabindex="0" id="nav-machines">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8m-4-4v4"/>
+          </svg>
+          Machine Status
+        </a>
+        <a class="nav-item" data-section="alerts" role="button" tabindex="0" id="nav-alerts">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          Alerts
+          <span class="nav-badge hidden" id="alerts-badge" aria-label="Alert count">0</span>
+        </a>
+      </div>
+
+      <!-- Admin shortcut (shown only if user is admin visiting operator page) -->
+      <div class="sidebar-nav" id="admin-link-wrap" style="display:none">
+        <div class="nav-section-label">Admin</div>
+        <a class="nav-item" href="/admin-panel/" id="admin-link">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          Admin Panel
+        </a>
+      </div>
+
+      <!-- Bottom logout -->
+      <div class="sidebar-bottom">
+        <button class="sidebar-logout" id="logout-btn" aria-label="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ───────────────────────────────────────────────── -->
+  <div class="main-wrap">
+
+    <!-- Topbar -->
+    <header class="topbar" role="banner">
+      <button class="topbar-menu-btn" id="topbar-menu-btn" aria-label="Open sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <span class="topbar-title" id="topbar-title">Run Prediction</span>
+      <div class="topbar-actions">
+        <span class="topbar-time" id="live-clock" aria-live="off"></span>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main-content" id="main-content">
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: PREDICT
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel" id="section-predict" data-section="predict">
+
+        <!-- KPI quick stats row -->
+        <div class="kpi-strip" id="operator-kpi-strip">
+          <div class="kpi-card">
+            <div class="kpi-card-icon teal">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="kpi-label">My Predictions</div>
+            <div class="kpi-value" id="op-stat-total">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon red">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="kpi-label">Failures Detected</div>
+            <div class="kpi-value kpi-danger" id="op-stat-failures">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon green">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="kpi-label">Healthy Runs</div>
+            <div class="kpi-value kpi-success" id="op-stat-healthy">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon amber">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            </div>
+            <div class="kpi-label">Failure Rate</div>
+            <div class="kpi-value" id="op-stat-rate">—</div>
+          </div>
+        </div>
+
+        <!-- Predict layout: form + result -->
+        <div class="predict-layout">
+
+          <!-- Prediction form -->
+          <div class="predict-form-card">
+            <div class="form-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run Failure Prediction
+            </div>
+            <p class="form-card-desc">Enter live sensor readings to predict machine failure probability.</p>
+
+            <form id="predict-form" novalidate>
+              <div class="form-grid">
+
+                <div class="form-group">
+                  <label class="form-label" for="machine-id-input">Machine ID <span aria-hidden="true">*</span></label>
+                  <input class="form-input" type="text" id="machine-id-input" name="machine_id" placeholder="e.g. M001" required />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="machine-type-input">Machine Type <span aria-hidden="true">*</span></label>
+                  <select class="form-input" id="machine-type-input" name="machine_type" required>
+                    <option value="">Select type</option>
+                    <option value="L">L — Low</option>
+                    <option value="M" selected>M — Medium</option>
+                    <option value="H">H — High</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="air-temp-input">Air Temperature (K) <span aria-hidden="true">*</span></label>
+                  <input class="form-input" type="number" id="air-temp-input" name="air_temperature" step="0.1" placeholder="295–305 K" required />
+                  <div class="form-hint">Normal range: 295 – 305 K</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="process-temp-input">Process Temperature (K) <span aria-hidden="true">*</span></label>
+                  <input class="form-input" type="number" id="process-temp-input" name="process_temperature" step="0.1" placeholder="306–314 K" required />
+                  <div class="form-hint">Normal range: 306 – 314 K</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="rot-speed-input">Rotational Speed (RPM) <span aria-hidden="true">*</span></label>
+                  <input class="form-input" type="number" id="rot-speed-input" name="rotational_speed" placeholder="1168–2886 RPM" required />
+                  <div class="form-hint">Normal range: 1168 – 2886 RPM</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="torque-input">Torque (Nm) <span aria-hidden="true">*</span></label>
+                  <input class="form-input" type="number" id="torque-input" name="torque" step="0.1" placeholder="3.8–76.6 Nm" required />
+                  <div class="form-hint">Normal range: 3.8 – 76.6 Nm</div>
+                </div>
+
+                <div class="form-group form-group-full">
+                  <label class="form-label" for="tool-wear-input">Tool Wear (min) <span aria-hidden="true">*</span></label>
+                  <input class="form-input" type="number" id="tool-wear-input" name="tool_wear" placeholder="0–253 min" required />
+                  <div class="form-hint">Operating minutes since last tool change. Range: 0 – 253 min</div>
+                </div>
+
+              </div>
+
+              <!-- Form error message -->
+              <div id="predict-error" class="predict-error hidden" role="alert" aria-live="polite"></div>
+
+              <button type="submit" class="btn btn-primary predict-submit" id="predict-submit-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Run Prediction
+              </button>
+            </form>
+          </div>
+
+          <!-- Result panel -->
+          <div class="result-panel-card" id="result-panel">
+            <div class="result-empty-state" id="result-empty">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="color:var(--color-text-faint)" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <strong style="color:var(--color-text-muted)">No prediction yet</strong>
+              <p>Fill in the sensor readings and hit <em>Run Prediction</em> to see the machine health result.</p>
+            </div>
+
+            <div class="result-result hidden" id="result-output" aria-live="polite">
+              <!-- Status banner -->
+              <div class="result-status-banner" id="result-banner">
+                <div class="result-status-icon" id="result-icon">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <div>
+                  <div class="result-status-label" id="result-label">Machine Healthy</div>
+                  <div class="result-failure-type-label" id="result-failure-type"></div>
+                </div>
+              </div>
+
+              <!-- Metrics grid -->
+              <div class="result-metrics">
+                <div class="result-metric">
+                  <div class="result-metric-label">Health Status</div>
+                  <div class="result-metric-value" id="res-health">—</div>
+                </div>
+                <div class="result-metric">
+                  <div class="result-metric-label" id="res-prob-label">FAILURE PROBABILITY</div>
+                  <div class="result-metric-value" id="res-probability">—</div>
+                </div>
+                <div class="result-metric">
+                  <div class="result-metric-label">FAILURE TYPE</div>
+                  <div class="result-metric-value" id="res-failure-type">—</div>
+                </div>
+                <div class="result-metric">
+                  <div class="result-metric-label">INFERENCE LATENCY</div>
+                  <div class="result-metric-value font-mono" id="res-latency">—</div>
+                </div>
+              </div>
+
+              <!-- Recommendation -->
+              <div class="result-recommendation" id="result-recommendation"></div>
+            </div>
+
+          </div><!-- /result-panel -->
+
+        </div><!-- /predict-layout -->
+
+      </section><!-- /predict -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: HISTORY
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-history" data-section="history">
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">My Prediction History</div>
+              <div class="card-subtitle">All predictions you have run on this account</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="refresh-history-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" aria-label="My prediction history">
+              <thead>
+                <tr>
+                  <th>Machine</th>
+                  <th>Type</th>
+                  <th>Failure?</th>
+                  <th>Failure Type</th>
+                  <th>Health</th>
+                  <th>Tool Wear</th>
+                  <th>Torque</th>
+                  <th>Inference</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr><td colspan="9" class="table-empty">Loading history…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section><!-- /history -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: MACHINES
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-machines" data-section="machines">
+
+        <div class="section-header">
+          <div>
+            <div class="section-title">Machine Status</div>
+            <div class="section-desc">Real-time health overview of all registered machines in the fleet.</div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary btn-sm" id="refresh-machines-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="machine-grid" id="machine-grid">
+          <!-- skeleton -->
+          <div class="machine-card-skeleton skeleton"></div>
+          <div class="machine-card-skeleton skeleton"></div>
+          <div class="machine-card-skeleton skeleton"></div>
+          <div class="machine-card-skeleton skeleton"></div>
+        </div>
+
+      </section><!-- /machines -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: ALERTS
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-alerts" data-section="alerts">
+
+        <div class="section-header">
+          <div>
+            <div class="section-title">Recent Alerts</div>
+            <div class="section-desc">Latest machine failures and at-risk predictions requiring attention.</div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-secondary btn-sm" id="refresh-alerts-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="alerts-feed" id="alerts-feed">
+          <div class="table-empty" style="padding:var(--space-8)">Loading alerts…</div>
+        </div>
+
+      </section><!-- /alerts -->
+
+    </main><!-- /main-content -->
+  </div><!-- /main-wrap -->
+
+</div><!-- /app-root -->
+
+<!-- api.js MUST be first -->
+<script src="{% static 'js/api.js' %}"></script>
+<script src="{% static 'js/operator.js' %}"></script>
+
+</body>
+</html>

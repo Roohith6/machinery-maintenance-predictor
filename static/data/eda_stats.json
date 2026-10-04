@@ -1,0 +1,40 @@
+{
+  "failure_type_distribution": {
+    "No Failure": 9661,
+    "Tool Wear Failure": 46,
+    "Heat Dissipation Failure": 112,
+    "Power Failure": 95,
+    "Overstrain Failure": 78,
+    "Random Failures": 8
+  },
+  "machine_type_distribution": {
+    "L": 6000,
+    "M": 3000,
+    "H": 1000
+  },
+  "feature_stats": {
+    "air_temperature": {"mean": 300.0, "std": 2.0, "min": 295.3, "max": 304.5},
+    "process_temperature": {"mean": 310.0, "std": 1.5, "min": 305.7, "max": 313.8},
+    "rotational_speed": {"mean": 1538.8, "std": 179.3, "min": 1168, "max": 2886},
+    "torque": {"mean": 39.9, "std": 9.97, "min": 3.8, "max": 76.6},
+    "tool_wear": {"mean": 107.9, "std": 63.6, "min": 0, "max": 253}
+  },
+  "total_samples": 10000,
+  "failure_rate_percent": 3.39,
+  "tool_wear_by_failure": {
+    "No Failure": 107.0,
+    "Tool Wear Failure": 220.7,
+    "Heat Dissipation Failure": 101.4,
+    "Power Failure": 99.2,
+    "Overstrain Failure": 155.4,
+    "Random Failures": 60.9
+  },
+  "torque_by_failure": {
+    "No Failure": 39.0,
+    "Tool Wear Failure": 30.1,
+    "Heat Dissipation Failure": 49.5,
+    "Power Failure": 62.8,
+    "Overstrain Failure": 63.8,
+    "Random Failures": 39.4
+  }
+}

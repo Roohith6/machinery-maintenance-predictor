@@ -1,0 +1,456 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PM Dashboard — Admin Control Panel" />
+  <title>Admin Panel — PM Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- CSS load order matters: base → sidebar → admin -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sidebar.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/admin.css' %}" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SIDEBAR OVERLAY (mobile)
+════════════════════════════════════════════════════════════════ -->
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APP ROOT
+════════════════════════════════════════════════════════════════ -->
+<div class="app-root">
+
+  <!-- ── SIDEBAR ────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="sidebar-inner">
+
+      <!-- Logo -->
+      <div class="sidebar-logo-wrap">
+        <div class="sidebar-logo-icon">
+          <svg width="18" height="18" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <path d="M6 28V14L18 7l12 7v14" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <rect x="13" y="19" width="10" height="9" rx="1.5" stroke="currentColor" stroke-width="2"/>
+            <circle cx="18" cy="14" r="2.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div>
+          <div class="sidebar-logo-text">PM Dashboard</div>
+          <div class="sidebar-logo-version">ADMIN PANEL</div>
+        </div>
+        <!-- Close btn — mobile only -->
+        <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close sidebar" style="margin-left:auto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- User card -->
+      <div class="sidebar-user">
+        <div class="user-avatar admin-avatar" id="user-avatar">AD</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebar-user-name">Admin</div>
+          <div class="sidebar-user-role" id="sidebar-user-role">Administrator</div>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <div class="sidebar-nav">
+        <div class="nav-section-label">Main</div>
+        <a class="nav-item active" data-section="overview" role="button" tabindex="0" id="nav-overview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+          </svg>
+          Overview
+        </a>
+        <a class="nav-item" data-section="predictions" role="button" tabindex="0" id="nav-predictions">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          Predictions
+        </a>
+        <a class="nav-item" data-section="machines" role="button" tabindex="0" id="nav-machines">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8m-4-4v4"/>
+          </svg>
+          Machines
+        </a>
+        <a class="nav-item" data-section="users" role="button" tabindex="0" id="nav-users">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Users
+        </a>
+        <div class="nav-section-label" style="margin-top:var(--space-3)">Analytics</div>
+        <a class="nav-item" data-section="charts" role="button" tabindex="0" id="nav-charts">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          Charts
+        </a>
+      </div>
+
+      <!-- Bottom logout -->
+      <div class="sidebar-bottom">
+        <button class="sidebar-logout" id="logout-btn" aria-label="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ───────────────────────────────────────────────── -->
+  <div class="main-wrap">
+
+    <!-- Topbar -->
+    <header class="topbar" role="banner">
+      <button class="topbar-menu-btn" id="topbar-menu-btn" aria-label="Open sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <span class="topbar-title" id="topbar-title">Overview</span>
+      <div class="topbar-actions">
+        <span class="topbar-time" id="live-clock" aria-live="off"></span>
+        <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="Toggle theme">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main-content" id="main-content">
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: OVERVIEW
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel" id="section-overview" data-section="overview">
+
+        <!-- KPI Cards -->
+        <div class="kpi-strip-5" id="kpi-strip">
+          <div class="kpi-card">
+            <div class="kpi-card-icon teal">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="kpi-label">Total Predictions</div>
+            <div class="kpi-value" id="kpi-total-predictions">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon amber">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="kpi-label">Today's Predictions</div>
+            <div class="kpi-value" id="kpi-today-predictions">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon red">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="kpi-label">Total Failures</div>
+            <div class="kpi-value kpi-danger" id="kpi-total-failures">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon red">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="kpi-label">Failure Rate</div>
+            <div class="kpi-value kpi-danger" id="kpi-failure-rate">—</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon green">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+            </div>
+            <div class="kpi-label">Active Machines</div>
+            <div class="kpi-value" id="kpi-active-machines">—</div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-title">Failure Type Distribution</div>
+                <div class="chart-subtitle">All-time prediction breakdown</div>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-failure-type" aria-label="Failure type distribution"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-title">Machine Health</div>
+                <div class="chart-subtitle">Current fleet status</div>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-machine-health" aria-label="Machine health distribution"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-title">7-Day Prediction Trend</div>
+                <div class="chart-subtitle">Daily prediction volume</div>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-trend" aria-label="Prediction trend over 7 days"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Recent alerts -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Failure Alerts</div>
+              <div class="card-subtitle">Latest critical and at-risk predictions</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="refresh-alerts-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="activity-feed" id="alerts-feed">
+            <div class="table-empty" style="padding:var(--space-8)">Loading alerts…</div>
+          </div>
+        </div>
+
+      </section><!-- /overview -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: PREDICTIONS
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-predictions" data-section="predictions">
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">All Predictions</div>
+              <div class="card-subtitle">Complete prediction history across all operators</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="refresh-predictions-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" aria-label="Prediction history">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Machine</th>
+                  <th>Type</th>
+                  <th>Operator</th>
+                  <th>Failure?</th>
+                  <th>Failure Type</th>
+                  <th>Health</th>
+                  <th>Tool Wear</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="predictions-tbody">
+                <tr><td colspan="9" class="table-empty">Loading predictions…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section><!-- /predictions -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: MACHINES
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-machines" data-section="machines">
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Machine Registry</div>
+              <div class="card-subtitle">All registered machines and their current health</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="refresh-machines-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+              Refresh
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" aria-label="Machine registry">
+              <thead>
+                <tr>
+                  <th>Machine ID</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Location</th>
+                  <th>Health</th>
+                  <th>Failures</th>
+                  <th>Last Check</th>
+                </tr>
+              </thead>
+              <tbody id="machines-tbody">
+                <tr><td colspan="7" class="table-empty">Loading machines…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section><!-- /machines -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: USERS
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-users" data-section="users">
+
+        <!-- Add user drawer -->
+        <div class="add-user-drawer" id="add-user-drawer" style="display:none" aria-hidden="true">
+          <div class="drawer-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+            Create New User
+          </div>
+          <form id="create-user-form" novalidate>
+            <div class="drawer-form-grid">
+              <div class="form-group">
+                <label class="form-label" for="new-username">Username <span aria-hidden="true">*</span></label>
+                <input class="form-input" type="text" id="new-username" name="username" autocomplete="off" required placeholder="e.g. operator2" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-email">Email <span aria-hidden="true">*</span></label>
+                <input class="form-input" type="email" id="new-email" name="email" required placeholder="user@company.com" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-first-name">First Name</label>
+                <input class="form-input" type="text" id="new-first-name" name="first_name" placeholder="First name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-last-name">Last Name</label>
+                <input class="form-input" type="text" id="new-last-name" name="last_name" placeholder="Last name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-password">Password <span aria-hidden="true">*</span></label>
+                <input class="form-input" type="password" id="new-password" name="password" required placeholder="Min 8 characters" />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="new-role">Role <span aria-hidden="true">*</span></label>
+                <select class="form-input" id="new-role" name="role" required>
+                  <option value="operator" selected>Operator</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div id="create-user-msg" class="form-feedback" role="alert" aria-live="polite"></div>
+            <div class="drawer-actions">
+              <button type="submit" class="btn btn-primary" id="create-user-submit-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Create User
+              </button>
+              <button type="button" class="btn btn-secondary" id="cancel-add-user-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">User Management</div>
+              <div class="card-subtitle">All registered accounts and their roles</div>
+            </div>
+            <button class="btn btn-primary btn-sm" id="toggle-add-user-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add User
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" aria-label="User list">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr><td colspan="6" class="table-empty">Loading users…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section><!-- /users -->
+
+      <!-- ════════════════════════════════════════════════════════
+           SECTION: CHARTS (detailed analytics)
+      ════════════════════════════════════════════════════════ -->
+      <section class="section-panel hidden" id="section-charts" data-section="charts">
+
+        <!-- Full-width trend chart -->
+        <div class="chart-card-full">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">7-Day Prediction Volume</div>
+              <div class="chart-subtitle">Daily prediction activity over the last week</div>
+            </div>
+          </div>
+          <div class="chart-wrap-tall"><canvas id="chart-trend-full" aria-label="7-day prediction trend"></canvas></div>
+        </div>
+
+        <!-- 2-col chart row -->
+        <div class="charts-row-2">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-title">Failure Type Breakdown</div>
+                <div class="chart-subtitle">Distribution of all detected failure modes</div>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-failure-type-2" aria-label="Failure type breakdown"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-title">Machine Health Distribution</div>
+                <div class="chart-subtitle">Fleet-wide health status summary</div>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-machine-health-2" aria-label="Machine health chart"></canvas></div>
+          </div>
+        </div>
+
+      </section><!-- /charts -->
+
+    </main><!-- /main-content -->
+  </div><!-- /main-wrap -->
+
+</div><!-- /app-root -->
+
+<!-- Scripts: api.js FIRST, then admin.js -->
+<script src="{% static 'js/api.js' %}"></script>
+<script src="{% static 'js/admin.js' %}"></script>
+
+</body>
+</html>
